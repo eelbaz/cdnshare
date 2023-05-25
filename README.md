@@ -53,9 +53,11 @@ An example `config.json` structure is shown below:
 ### Usage
 
 To run the application, use the `go run` command followed by the name of the file.
-
+``` go mod init```
+```go mod tidy```
 ```bash
 go run main.go
+```
 ```
 
 The application will start collecting the streaming URLs and saving the extracted data to the specified MySQL database.
@@ -66,7 +68,7 @@ The application works in the following steps:
 
 1. Reads the `config.json` file and establishes a connection with the MySQL database.
 
-2. Loads the cache data from the `whois_cache.gob` file if it exists.
+2. Loads any whois cache data from the `whois_cache.gob` file  from previous runs if it exists. This is intended to avoid spamming/abusing the whois look up db.
 
 3. For each account in the config, it navigates to the URLs and listens for network events.
 
