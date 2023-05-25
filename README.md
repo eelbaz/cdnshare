@@ -1,6 +1,6 @@
 # CDN Data Collection Tool
 
-This application is used for collecting data about content delivery networks (CDNs). The program collects streaming URLs from specified accounts logs into the streaming service via `chromedp`  listening on the client's network events via chrome developer tools protocol (cdp), and extracts the CDN's organization name, and other useful network level details, using the `whois` protocol. The extracted data is then saved in a MySQL database for later use in share and workflow analysis.
+This application is used for collecting data about content delivery networks (CDNs). The program collects streaming URLs from specified accounts, logging into the streaming service via `chromedp`  listening on the client's network events via chrome developer tools protocol (cdp), and extracts the CDN's organization name, and other useful network level details, using the `whois` protocol. The extracted data is then saved in a MySQL database for later use in share and workflow analysis.
 
 ## Getting Started
 
