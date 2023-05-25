@@ -53,8 +53,7 @@ An example `config.json` structure is shown below:
 ### Usage
 
 To run the application, use the `go run` command followed by the name of the file.
-``` go mod init```
-```go mod tidy```
+
 ```bash
 go run main.go
 ```
@@ -62,7 +61,7 @@ go run main.go
 
 The application will start collecting the streaming URLs and saving the extracted data to the specified MySQL database.
 
-## Understanding the Code
+### Understanding the Code
 
 The application works in the following steps:
 
@@ -78,10 +77,10 @@ The application works in the following steps:
 
 6. Finally, it saves the cache data to the `whois_cache.gob` file for future use.
 
-## Customization
+### Customization
 
 You can customize the application by adding more pretty name mappings in the `cdnOrgNameMappings` variable and adding more account details in the `config.json` file.
 
-## Note
+### Note
 
 Please make sure that you have necessary permissions to scrape data from the websites, as web scraping is subject to the legal and ethical issues.
