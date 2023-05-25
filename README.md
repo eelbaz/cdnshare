@@ -37,12 +37,12 @@ An example `config.json` structure is shown below:
     {
       "name": "Account 1",
       "unit": "Unit 1",
-      "id": "ID 1",
+      "id": "Account ID 1",
       "urls": {
-        "live": "http://live.example.com",
-        "ondemand": "http://ondemand.example.com"
+        "live": "http://live.example-streaming-service.com",
+        "ondemand": "http://ondemand.example-streaming-service.com"
       },
-      "mediaTypeFilters": ["filter1", "filter2"],
+      "mediaTypeFilters": [".ts", ".mp4",".m4s",".mpd",".m3u8"],
       "sleepDuration": 10,
       "db_table_name": "cdn_data_account1"
     }
