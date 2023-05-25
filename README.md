@@ -52,6 +52,12 @@ An example `config.json` structure is shown below:
 
 ### Usage
 
+Initialize all of the dependencies: 
+```
+go mod init
+go mod tidy
+```
+
 To run the application, use the `go run` command followed by the name of the file.
 
 ```bash
