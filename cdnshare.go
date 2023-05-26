@@ -250,23 +250,6 @@ func parseWhois(whoisResult string, expectedFields []string) string {
 	return ""
 }
 
-/**
-func saveData(account Account, data CdnShareData) error {
-	query := fmt.Sprintf(`INSERT INTO %s (timestamp, cdn_ip, customer_hostname, cdn_org_name, customer_stream_type, account_name, account_unit, account_id, whois) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, account.DBTableName)
-
-	_, err := db.Exec(query, data.Timestamp, data.CdnIp, data.CustomerHostname, data.CdnOrgName, data.CustomerStreamType, data.AccountName, data.AccountUnit, data.AccountID, data.ParsedWhois)
-	return err
-}
-
-**/
-
-/**func saveData(account Account, data CdnShareData) error {
-	query := fmt.Sprintf(`INSERT INTO %s (timestamp, cdn_ip, hostname, cdn_orgname, stream_type, account_name, account_unit, account_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, account.DBTableName)
-
-	_, err := db.Exec(query, data.Timestamp, data.CdnIp, data.CustomerHostname, data.CdnOrgName, data.CustomerStreamType, data.AccountName, data.AccountUnit, data.AccountID)
-	return err
-}**/
-
 func saveData(account Account, data CdnShareData) error {
 	// Ensure the table exists before trying to insert data.
 	err := ensureTableExists(account.DBTableName)
@@ -276,7 +259,9 @@ func saveData(account Account, data CdnShareData) error {
 
 	query := fmt.Sprintf(`INSERT INTO %s (timestamp, cdn_ip, hostname, cdn_orgname, stream_type, account_name, account_unit, account_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, account.DBTableName)
 
-	_, err = db.Exec(query, data.Timestamp, data.CdnIp, data.CustomerHostname, data.CdnOrgName, data.CustomerStreamType, data.AccountName, data.AccountUnit, data.AccountID)
+	formattedTimestamp := data.Timestamp.Format("2006-01-02 15:04:05")
+
+	_, err = db.Exec(query, formattedTimestamp, data.CdnIp, data.CustomerHostname, data.CdnOrgName, data.CustomerStreamType, data.AccountName, data.AccountUnit, data.AccountID)
 	return err
 }
 
