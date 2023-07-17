@@ -17,8 +17,11 @@ import (
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/ipinfo/go/v2/ipinfo"
 	"github.com/likexian/whois"
 )
+
+const IPINFO_TOKEN = "__YOUR_IPINFO_TOKEN_HERE"
 
 type Config struct {
 	Database struct {
@@ -78,6 +81,10 @@ var cdnOrgNameMappings = []PrettyNameMapping{
 	{
 		Pattern:    "Akamai",
 		PrettyName: "Akamai, Inc.",
+	},
+	{
+		Pattern:    "Stack",
+		PrettyName: "StackPath LLC.",
 	},
 
 	// Add more mappings as needed
@@ -171,7 +178,7 @@ func processRequest(ev *network.EventRequestWillBeSent, account Account, streamT
 }
 
 func processFilteredRequest(url string, account Account, streamType string) {
-	data, err := who(url, []string{"OrgName", "org-name"})
+	data, err := who(url)
 	if err != nil {
 		log.Println("Error getting WHOIS data:", err)
 		return
@@ -191,7 +198,57 @@ func processFilteredRequest(url string, account Account, streamType string) {
 	time.Sleep(time.Duration(account.SleepDuration) * time.Second)
 }
 
-func who(u string, expectedFields []string) (CdnShareData, error) {
+func who(u string) (CdnShareData, error) {
+	parsedURL, err := url.Parse(u)
+	if err != nil {
+		return CdnShareData{}, err
+	}
+
+	hostname := parsedURL.Host
+
+	ips, err := net.LookupIP(hostname)
+	if err != nil {
+		return CdnShareData{}, err
+	}
+
+	ip := ips[0]
+
+	if data, ok := whoisCache[ip.String()]; ok {
+		return CdnShareData{
+			Timestamp:        time.Now(),
+			CdnIp:            ip.String(),
+			CustomerHostname: hostname,
+			CdnOrgName:       prettyCdnOrgName(data.CdnOrgName),
+			ParsedWhois:      data.ParsedWhois,
+		}, nil
+	}
+
+	// Create a new client for the ipinfo package.
+	client := ipinfo.NewClient(nil, nil, IPINFO_TOKEN)
+
+	info, err := client.GetIPInfo(ip)
+	if err != nil {
+		return CdnShareData{}, err
+	}
+
+	cdnOrgName, _ := client.GetIPOrg(ip)
+	prettyName := prettyCdnOrgName(cdnOrgName)
+
+	whoisCache[ip.String()] = WhoisCacheData{
+		Timestamp:   time.Now(),
+		CdnOrgName:  prettyName,
+		ParsedWhois: info.Org,
+	}
+	return CdnShareData{
+		Timestamp:        time.Now(),
+		CdnIp:            ip.String(),
+		CustomerHostname: hostname,
+		CdnOrgName:       prettyName,
+		ParsedWhois:      info.Org,
+	}, nil
+}
+
+func who2(u string, expectedFields []string) (CdnShareData, error) {
 	parsedURL, err := url.Parse(u)
 	if err != nil {
 		return CdnShareData{}, err
@@ -250,6 +307,23 @@ func parseWhois(whoisResult string, expectedFields []string) string {
 	return ""
 }
 
+/**
+func saveData(account Account, data CdnShareData) error {
+	query := fmt.Sprintf(`INSERT INTO %s (timestamp, cdn_ip, customer_hostname, cdn_org_name, customer_stream_type, account_name, account_unit, account_id, whois) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, account.DBTableName)
+
+	_, err := db.Exec(query, data.Timestamp, data.CdnIp, data.CustomerHostname, data.CdnOrgName, data.CustomerStreamType, data.AccountName, data.AccountUnit, data.AccountID, data.ParsedWhois)
+	return err
+}
+
+**/
+
+/**func saveData(account Account, data CdnShareData) error {
+	query := fmt.Sprintf(`INSERT INTO %s (timestamp, cdn_ip, hostname, cdn_orgname, stream_type, account_name, account_unit, account_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, account.DBTableName)
+
+	_, err := db.Exec(query, data.Timestamp, data.CdnIp, data.CustomerHostname, data.CdnOrgName, data.CustomerStreamType, data.AccountName, data.AccountUnit, data.AccountID)
+	return err
+}**/
+
 func saveData(account Account, data CdnShareData) error {
 	// Ensure the table exists before trying to insert data.
 	err := ensureTableExists(account.DBTableName)
@@ -259,9 +333,7 @@ func saveData(account Account, data CdnShareData) error {
 
 	query := fmt.Sprintf(`INSERT INTO %s (timestamp, cdn_ip, hostname, cdn_orgname, stream_type, account_name, account_unit, account_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, account.DBTableName)
 
-	formattedTimestamp := data.Timestamp.Format("2006-01-02 15:04:05")
-
-	_, err = db.Exec(query, formattedTimestamp, data.CdnIp, data.CustomerHostname, data.CdnOrgName, data.CustomerStreamType, data.AccountName, data.AccountUnit, data.AccountID)
+	_, err = db.Exec(query, data.Timestamp, data.CdnIp, data.CustomerHostname, data.CdnOrgName, data.CustomerStreamType, data.AccountName, data.AccountUnit, data.AccountID)
 	return err
 }
 
