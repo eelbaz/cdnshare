@@ -1,0 +1,37 @@
+{
+    "database": {
+        "host": "0.0.0.0",
+        "port": "[port]",
+        "database": "cdnshare",
+        "user": "[_enter_username_]",
+        "password":[_enter_pwd_]",
+        "maxOpenConns": 1000,
+        "maxIdleConns": 50
+    },
+    "accounts": [
+        {
+            "name":"Example Television LLC.",
+            "unit":"TV-X",
+            "id":"1-K0000",
+            "urls": {
+                "live": "https://tv.example.com/en/live-tv/",
+                "ondemand": "https://tv.example.com/en/on-demand/"
+            },
+            "mediaTypeFilters": [".ts", ".mp4",".m4s"],
+            "sleepDuration": 5,
+            "db_table_name": "cdnshare"
+        },
+        {
+            "name":"Example Television LLC.",
+            "unit":"TV-Y",
+            "id":"1-K0000",
+                "urls": {
+                    "live": "https://tv.example.com/en/live-tv/",
+                    "ondemand": "https://tv.example.com/en/on-demand/"
+                },
+            "mediaTypeFilters": [".ts", ".mp4",".m4s"],
+            "sleepDuration": 5,
+            "db_table_name": "[_db_table_name_]"
+        }
+    ]
+}
