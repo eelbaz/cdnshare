@@ -89,4 +89,4 @@ You can customize the application by adding more pretty name mappings in the `cd
 
 ### Note
 
-Please make sure that you have necessary permissions to scrape data from the websites, as web scraping is subject to the legal and ethical issues.
+Please make sure that you have necessary permissions to scrape data from the website terms of service.
